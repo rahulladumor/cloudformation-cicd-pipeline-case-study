@@ -1,0 +1,6 @@
+.DS_Store
+.aws/
+*.pyc
+__pycache__/
+node_modules/
+diagrams/*.png
