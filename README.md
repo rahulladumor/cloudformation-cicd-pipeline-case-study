@@ -32,58 +32,30 @@ Complete serverless CI/CD pipeline using:
 
 ```mermaid
 graph LR
-    subgraph Developer
-        Dev[Developer<br/>Push Code]
-        PR[Pull Request]
-    end
-    
-    subgraph Source Control
-        CodeCommit[AWS CodeCommit<br/>Git Repository<br/>3 Branches]
-        Dev -->|git push| CodeCommit
-        PR -->|merge| CodeCommit
-    end
-    
-    subgraph CI/CD Pipeline
-        Pipeline[AWS CodePipeline<br/>Orchestration]
-        
-        CodeCommit -->|Trigger| Pipeline
-    end
-    
-    subgraph Build Stage
-        CodeBuild[AWS CodeBuild<br/>Docker Container<br/>Run Tests]
-        
-        Pipeline -->|Source| CodeBuild
-    end
-    
-    subgraph Artifact Storage
-        S3[S3 Bucket<br/>Build Artifacts<br/>Versioned]
-        
-        CodeBuild -->|Store| S3
-    end
-    
-    subgraph Deploy Stage
-        CodeDeploy[AWS CodeDeploy<br/>Blue/Green Deploy]
-        
-        S3 -->|Retrieve| CodeDeploy
-    end
-    
-    subgraph Environments
-        Dev [Development<br/>Auto-Deploy]
-        Staging[Staging<br/>Manual Approval]
-        Prod[Production<br/>Manual Approval]
-        
-        CodeDeploy -->|Deploy| DevEnv
-        CodeDeploy -->|Approval| Staging
-        CodeDeploy -->|Approval| Prod
-    end
-    
-    subgraph Notifications
-        SNS[SNS Topic<br/>Email/Slack]
-        
-        Pipeline -->|Success/Failure| SNS
-        Staging -->|Approval Request| SNS
-        Prod -->|Approval Request| SNS
-    end
+    Dev[Developer]
+    PR[Pull Request]
+    Repo[CodeCommit Repository]
+    Pipeline[CodePipeline]
+    Build[CodeBuild]
+    S3[Artifact S3 Bucket]
+    Deploy[CodeDeploy]
+    DevEnv[Development]
+    Staging[Staging]
+    Prod[Production]
+    SNS["Notifications via SNS"]
+
+    Dev -->|Push Code| Repo
+    PR -->|Merge| Repo
+    Repo -->|Trigger| Pipeline
+    Pipeline -->|Run Build| Build
+    Build -->|Store Artifacts| S3
+    S3 -->|Deploy Artifacts| Deploy
+    Deploy -->|Auto Deploy| DevEnv
+    Deploy -->|Manual Approval| Staging
+    Deploy -->|Manual Approval| Prod
+    Pipeline -->|Success / Failure| SNS
+    Staging -->|Approval Request| SNS
+    Prod -->|Approval Request| SNS
 ```
 
 
